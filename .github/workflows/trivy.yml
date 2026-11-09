@@ -8,13 +8,13 @@ jobs:
       - name: Build Docker image
         run: docker build -t devsecops-tp:latest .
       - name: Trivy scan (rapport HIGH et CRITICAL)
-        uses: aquasecurity/trivy-action@0.28.0
+        uses: aquasecurity/trivy-action@0.35.0
         with:
           image-ref: devsecops-tp:latest
           severity: HIGH,CRITICAL
           exit-code: "0"
       - name: Trivy gate (echec si CRITICAL)
-        uses: aquasecurity/trivy-action@0.28.0
+        uses: aquasecurity/trivy-action@0.35.0
         with:
           image-ref: devsecops-tp:latest
           severity: CRITICAL
