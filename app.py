@@ -1,6 +1,7 @@
 from flask import Flask, request
+import re
 import sqlite3
-import os
+import subprocess
 
 app = Flask(__name__)
 
@@ -12,14 +13,16 @@ def home():
 def user():
     name = request.args.get("name", "")
     conn = sqlite3.connect("users.db")
-    query = "SELECT * FROM users WHERE name = '" + name + "'"
-    rows = conn.execute(query).fetchall()
+    rows = conn.execute("SELECT * FROM users WHERE name = ?", (name,)).fetchall()
     return str(rows)
 
 @app.route("/ping")
 def ping():
     host = request.args.get("host", "127.0.0.1")
-    return os.popen("ping -c 1 " + host).read()
+    if not re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9.-]*", host):
+        return "Invalid host", 400
+    result = subprocess.run(["ping", "-c", "1", host], capture_output=True, text=True)
+    return result.stdout
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5000, debug=True)
+    app.run(host="0.0.0.0", port=5000)
